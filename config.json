@@ -1,0 +1,5 @@
+{
+	"serviceName": "http-client-exporter",
+	"language": "go",
+	"team": "sudo"
+}
