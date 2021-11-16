@@ -16,7 +16,7 @@ func NewMetrics() *metrics {
 				Name:      "requests_duration",
 				Help:      "The virusscan latencies in seconds.",
 			},
-			[]string{"phase"},
+			[]string{"phase", "host", "url"},
 		),
 	}
 

@@ -14,6 +14,8 @@ type roundTripTrace struct {
 	gotConn       time.Time
 	responseStart time.Time
 	end           time.Time
+	host          string
+	url           string
 }
 
 func (rtt roundTripTrace) Total() float64 {
@@ -38,25 +40,25 @@ func (rtt roundTripTrace) TotalConnect() float64 {
 	return dur.Seconds()
 }
 func (rtt roundTripTrace) Observe() {
-	promMetrics.ScanDur.WithLabelValues("resolve").Observe(rtt.TotalDNS())
+	promMetrics.ScanDur.WithLabelValues("resolve", rtt.host, rtt.url).Observe(rtt.TotalDNS())
 	if rtt.gotConn.IsZero() {
 		return
 	}
 
-	promMetrics.ScanDur.WithLabelValues("connect").Observe(rtt.TotalConnect())
+	promMetrics.ScanDur.WithLabelValues("connect", rtt.host, rtt.url).Observe(rtt.TotalConnect())
 
 	if rtt.responseStart.IsZero() {
 		return
 	}
 
-	promMetrics.ScanDur.WithLabelValues("processing").Observe(rtt.TotalProcessing())
+	promMetrics.ScanDur.WithLabelValues("processing", rtt.host, rtt.url).Observe(rtt.TotalProcessing())
 
 	if rtt.end.IsZero() {
 		return
 	}
 
-	promMetrics.ScanDur.WithLabelValues("total").Observe(rtt.Total())
-	promMetrics.ScanDur.WithLabelValues("transfer").Observe(rtt.TotalTransfer())
+	promMetrics.ScanDur.WithLabelValues("total", rtt.host, rtt.url).Observe(rtt.Total())
+	promMetrics.ScanDur.WithLabelValues("transfer", rtt.host, rtt.url).Observe(rtt.TotalTransfer())
 }
 
 type transport struct {
@@ -76,7 +78,7 @@ func newTransport(t http.RoundTripper) *transport {
 
 // RoundTrip switches to a new trace, then runs embedded RoundTripper.
 func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	trace := &roundTripTrace{}
+	trace := &roundTripTrace{host: req.Host, url: req.URL.RequestURI()}
 	t.current = trace
 	t.traces = append(t.traces, trace)
 

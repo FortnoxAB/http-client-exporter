@@ -58,6 +58,7 @@ func testEndpoint(c *gin.Context) {
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		logrus.Error(err)
+		return
 	}
 	resp.Body.Close()
 	tt.current.end = time.Now()
