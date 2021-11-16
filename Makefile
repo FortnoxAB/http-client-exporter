@@ -1,15 +1,15 @@
 .PHONY:	build push run
 
-IMAGE = quay.io/fortnox/kube-annotations-exporter
+IMAGE = quay.io/fortnox/kube-annotations
 # supply when running make: make all VERSION=1.0.0
 #VERSION = 0.0.1
 
 build:
-	CGO_ENABLED=0 GOOS=linux go build ./cmd/kube-annotations-exporter
+	CGO_ENABLED=0 GOOS=linux go build ./cmd/kube-annotations
 
 docker: build
 	docker build --pull --rm -t $(IMAGE):$(VERSION) .
-	rm kube-annotations-exporter
+	rm kube-annotations
 
 push: docker
 	docker push $(IMAGE):$(VERSION)
