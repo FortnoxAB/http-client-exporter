@@ -17,7 +17,8 @@ var promMetrics = NewMetrics()
 
 func main() {
 	flag.Parse()
-	g := gin.Default()
+	g := gin.New()
+	g.Use(gin.Recovery())
 
 	m := ginprometheus.New("http")
 	m.Use(g)
